@@ -1,5 +1,12 @@
 #include "transaction.h"
 
+/**
+ * match_unspent - finds unspent to match txi
+ * @node: utxo
+ * @arg: txi struct
+ * Return: 0 if continue else 1
+ * Author: Frank Onyema Orji.
+ */
 int match_unspent(llist_node_t node, void *arg)
 {
 	unspent_tx_out_t *utxo = node;
@@ -10,6 +17,13 @@ int match_unspent(llist_node_t node, void *arg)
 	return (0);
 }
 
+/**
+ * check_inputs - validates each input
+ * @node: txi
+ * @idx: index of node
+ * @arg: visitor
+ * Return: 0 if continue else 1
+ */
 int check_inputs(llist_node_t node, unsigned int idx, void *arg)
 {
 	tx_in_t *txi = node;
@@ -24,13 +38,6 @@ int check_inputs(llist_node_t node, unsigned int idx, void *arg)
 		visitor->valid = 0;
 		return (1);
 	}
-	if (llist_find_node(visitor->used_utxos, match_unspent, txi))
-	{
-		dprintf(2, "check_inputs: double spend detected\n");
-		visitor->valid = 0;
-		return (1);
-	}
-	llist_add_node(visitor->used_utxos, utxo, ADD_NODE_REAR);
 	key = ec_from_pub(utxo->out.pub);
 	if (!key ||
 		!ec_verify(key, visitor->tx->id, SHA256_DIGEST_LENGTH, &txi->sig))
@@ -45,6 +52,13 @@ int check_inputs(llist_node_t node, unsigned int idx, void *arg)
 	(void)idx;
 }
 
+/**
+ * check_outputs - validates each input
+ * @node: tx_out_t *
+ * @idx: index of node
+ * @arg: visitor
+ * Return: 0 if continue else 1
+ */
 int check_outputs(llist_node_t node, unsigned int idx, void *arg)
 {
 	tx_out_t *txo = node;
@@ -55,6 +69,12 @@ int check_outputs(llist_node_t node, unsigned int idx, void *arg)
 	(void)idx;
 }
 
+/**
+ * transaction_is_valid - validates tx
+ * @transaction: the tx to validate
+ * @all_unspent: all unspent txo's
+ * Return: 1 if valid else 0
+ */
 int transaction_is_valid(transaction_t const *transaction,
 	llist_t *all_unspent)
 {
@@ -63,24 +83,20 @@ int transaction_is_valid(transaction_t const *transaction,
 
 	if (!transaction || !all_unspent)
 		return (0);
-	if (!llist_size(transaction->inputs) || !llist_size(transaction->outputs))
-		return (0);
 	visitor.tx = transaction;
 	visitor.all_unspent = all_unspent;
-	visitor.used_utxos = llist_create(MT_SUPPORT_FALSE);
 	visitor.valid = 1;
-	if (!visitor.used_utxos)
-		return (0);
 	if (!transaction_hash(transaction, hash_buf))
-		return (llist_destroy(visitor.used_utxos, 0, NULL), 0);
+		return (0);
 	if (memcmp(transaction->id, hash_buf, SHA256_DIGEST_LENGTH))
-		return (llist_destroy(visitor.used_utxos, 0, NULL), 0);
+		return (0);
 	if (llist_for_each(transaction->inputs, check_inputs, &visitor) ||
 		!visitor.valid)
-		return (llist_destroy(visitor.used_utxos, 0, NULL), 0);
+		return (0);
 	if (llist_for_each(transaction->outputs, check_outputs, &visitor) ||
 		visitor.in_amount != visitor.out_amount || !visitor.in_amount)
-		return (llist_destroy(visitor.used_utxos, 0, NULL), 0);
-	llist_destroy(visitor.used_utxos, 0, NULL);
+	{
+		return (0);
+	}
 	return (1);
 }
