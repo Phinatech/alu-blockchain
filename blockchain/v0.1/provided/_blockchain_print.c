@@ -139,3 +139,4 @@ void _blockchain_print_brief(blockchain_t const *blockchain)
 	printf("}\n");
 	fflush(NULL);
 }
+

@@ -16,3 +16,4 @@ void _blockchain_destroy(blockchain_t *blockchain)
 
 	free(blockchain);
 }
+

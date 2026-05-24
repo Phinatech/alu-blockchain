@@ -27,3 +27,4 @@ tx_in_t *tx_in_create(unspent_tx_out_t const *unspent)
 
 	return (tx_in);
 }
+

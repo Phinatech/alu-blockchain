@@ -34,3 +34,4 @@ int main(void)
 	_blockchain_destroy(blockchain);
 	return (EXIT_SUCCESS);
 }
+

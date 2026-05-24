@@ -68,3 +68,4 @@ int hash_outputs(llist_node_t node, unsigned int idx, void *arg)
 	return (0);
 	(void)idx;
 }
+

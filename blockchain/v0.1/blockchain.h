@@ -123,3 +123,4 @@ void _blockchain_destroy(blockchain_t *blockchain);
 void _blockchain_print(blockchain_t const *blockchain);
 
 #endif /* BLOCKCHAIN_H */
+

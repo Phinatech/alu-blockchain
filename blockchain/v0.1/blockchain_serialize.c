@@ -70,3 +70,4 @@ int block_serialize(llist_node_t node_ptr, int idx, void *arg)
 	fwrite(block->hash, sizeof(block->hash), 1, file);
 	return (sizeof(*block));
 }
+
