@@ -63,6 +63,8 @@ int transaction_is_valid(transaction_t const *transaction,
 
 	if (!transaction || !all_unspent)
 		return (0);
+	if (!llist_size(transaction->inputs) || !llist_size(transaction->outputs))
+		return (0);
 	visitor.tx = transaction;
 	visitor.all_unspent = all_unspent;
 	visitor.used_utxos = llist_create(MT_SUPPORT_FALSE);
